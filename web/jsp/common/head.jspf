@@ -1,0 +1,27 @@
+<%@ page pageEncoding="UTF-8" contentType="text/html; charset=UTF-8" %>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<%
+    String pt = (String) request.getAttribute("pageTitle");
+    if (pt == null) pt = "萌宠之家";
+%>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title><%= pt %> - 萌宠之家</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐾</text></svg>">
+
+<!-- Google Fonts（国内镜像） -->
+<link href="https://fonts.font.im/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;family=Be+Vietnam+Pro:wght@400;500;600&amp;display=swap" rel="stylesheet">
+
+<!-- Material Symbols Outlined（本地自托管） -->
+<link rel="stylesheet" href="<%=request.getContextPath()%>/static/css/material-symbols.css?v=1">
+
+<!-- Tailwind CSS（本地编译，不再依赖 CDN） -->
+<!-- 修改 tailwind.config.js 后需重新编译：npx tailwindcss -i web/static/css/tailwind/input.css -o web/static/css/tailwind/tailwind.min.css --minify -->
+<link rel="stylesheet" href="<%=request.getContextPath()%>/static/css/tailwind/tailwind.min.css">
+
+<!-- 公共样式 -->
+<link rel="stylesheet" href="<%=request.getContextPath()%>/static/css/pethome.css">
+</head>
+<body>

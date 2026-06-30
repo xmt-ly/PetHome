@@ -1,0 +1,82 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="com.pethome.model.User" %>
+<%
+    // 获取当前请求的上下文路径
+    String ctx = request.getContextPath();
+
+    // 获取当前用户（可能为 null）
+    User currentUser = (User) session.getAttribute("user");
+
+    // 获取当前活动页面标识（由各页面在 head 中设置）
+    String activePage = (String) request.getAttribute("activePage");
+    if (activePage == null) activePage = "";
+%>
+
+<!-- 顶部导航栏 -->
+<header class="sticky top-0 z-50 bg-surface/80 backdrop-blur-md shadow-sm transition-all duration-300">
+<nav class="flex justify-between items-center w-full px-4 md:px-margin-desktop py-base max-w-7xl mx-auto h-20">
+    <!-- 品牌 Logo -->
+    <a href="<%=ctx%>/index.jsp" class="flex items-center gap-2 text-decoration-none">
+        <span class="material-symbols-outlined text-primary text-4xl">pets</span>
+        <span class="font-display-lg text-display-lg text-primary tracking-tight">萌宠之家</span>
+    </a>
+
+    <!-- 桌面端导航链接 -->
+    <div class="hidden md:flex items-center gap-xl">
+        <a href="<%=ctx%>/index.jsp"
+           class="<%=activePage.equals("home") ? "text-primary font-bold border-b-2 border-primary" : "text-on-surface-variant hover:text-primary" %> transition-colors py-1 font-body-md text-body-md text-decoration-none">
+            首页
+        </a>
+        <a href="<%=ctx%>/service"
+           class="<%=activePage.equals("services") ? "text-primary font-bold border-b-2 border-primary" : "text-on-surface-variant hover:text-primary" %> transition-colors py-1 font-body-md text-body-md text-decoration-none">
+            宠物服务
+        </a>
+        <a href="<%=ctx%>/product"
+           class="<%=activePage.equals("shop") ? "text-primary font-bold border-b-2 border-primary" : "text-on-surface-variant hover:text-primary" %> transition-colors py-1 font-body-md text-body-md text-decoration-none">
+            商城
+        </a>
+        <a href="<%=ctx%>/jsp/about.jsp"
+           class="<%=activePage.equals("about") ? "text-primary font-bold border-b-2 border-primary" : "text-on-surface-variant hover:text-primary" %> transition-colors py-1 font-body-md text-body-md text-decoration-none">
+            关于我们
+        </a>
+    </div>
+
+    <!-- 右侧操作按钮 -->
+    <div class="flex items-center gap-base">
+        <a href="<%=ctx%>/product?action=search" class="p-2 hover:bg-surface-container-low rounded-full transition-colors active:scale-95 text-decoration-none">
+            <span class="material-symbols-outlined text-on-surface-variant">search</span>
+        </a>
+        <a href="<%=ctx%>/cart?action=list" class="p-2 hover:bg-surface-container-low rounded-full transition-colors active:scale-95 text-decoration-none">
+            <span class="material-symbols-outlined text-on-surface-variant">shopping_cart</span>
+        </a>
+
+        <% if (currentUser != null) { %>
+            <!-- 已登录状态 -->
+            <div class="relative group">
+                <button class="p-2 hover:bg-surface-container-low rounded-full transition-colors active:scale-95 flex items-center gap-1">
+                    <span class="material-symbols-outlined text-primary">account_circle</span>
+                    <span class="hidden md:inline font-body-md text-body-md text-primary font-medium"><%=currentUser.getNickname() != null && !currentUser.getNickname().isEmpty() ? currentUser.getNickname() : currentUser.getUsername() %></span>
+                </button>
+                <!-- 下拉菜单 -->
+                <div class="absolute right-0 mt-2 w-48 bg-surface-container-lowest rounded-xl shadow-lg border border-outline-variant opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                    <a href="<%=ctx%>/jsp/user-profile.jsp" class="block px-4 py-3 hover:bg-surface-container-low rounded-t-xl text-on-surface text-decoration-none">个人中心</a>
+                    <a href="<%=ctx%>/order?action=list" class="block px-4 py-3 hover:bg-surface-container-low text-on-surface text-decoration-none">我的订单</a>
+                    <% if (currentUser.getRole() == 1) { %>
+                        <div class="border-t border-outline-variant"></div>
+                        <a href="<%=ctx%>/admin" class="block px-4 py-3 hover:bg-surface-container-low text-primary font-medium text-decoration-none">后台管理</a>
+                    <% } %>
+                    <div class="border-t border-outline-variant"></div>
+                    <a href="<%=ctx%>/user?action=logout" class="block px-4 py-3 hover:bg-surface-container-low rounded-b-xl text-on-surface-variant text-decoration-none">退出登录</a>
+                </div>
+            </div>
+        <% } else { %>
+            <!-- 未登录状态 -->
+            <a href="<%=ctx%>/jsp/login.jsp" class="text-decoration-none">
+                <button class="bg-primary text-white px-4 py-2 rounded-full font-label-sm text-label-sm hover:opacity-90 transition-opacity">
+                    登录
+                </button>
+            </a>
+        <% } %>
+    </div>
+</nav>
+</header>

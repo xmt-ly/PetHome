@@ -1,0 +1,69 @@
+
+<!-- Material Symbols 全局样式 -->
+<style>
+.material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    vertical-align: middle;
+}
+.bg-pattern {
+    background-image: radial-gradient(circle at 2px 2px, rgba(155, 69, 0, 0.05) 1px, transparent 0);
+    background-size: 24px 24px;
+}
+.hero-gradient {
+    background: linear-gradient(135deg, rgba(255, 219, 201, 0.4) 0%, rgba(251, 249, 248, 0) 100%);
+}
+.nav-glass {
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+.ambient-shadow {
+    box-shadow: 0 10px 30px -5px rgba(155, 69, 0, 0.05);
+}
+.bento-card {
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.bento-card:hover {
+    transform: translateY(-4px);
+}
+/* 滚动条样式 */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: #f1f1f1; }
+::-webkit-scrollbar-thumb { background: #ddc1b3; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #897266; }
+</style>
+
+<!-- JavaScript 公共部分 -->
+<script>
+// 等待页面加载完成后执行
+document.addEventListener('DOMContentLoaded', function() {
+    // Header 滚动效果
+    const header = document.querySelector('header');
+    if (header) {
+        window.addEventListener('scroll', function() {
+            if (window.scrollY > 50) {
+                header.classList.add('shadow-md');
+            } else {
+                header.classList.remove('shadow-md');
+            }
+        });
+    }
+
+    // Intersection Observer 淡入动画
+    const observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('opacity-100', 'translate-y-0');
+                entry.target.classList.remove('opacity-0', 'translate-y-10');
+            }
+        });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('section > div').forEach(function(el) {
+        el.classList.add('transition-all', 'duration-700', 'opacity-0', 'translate-y-10');
+        observer.observe(el);
+    });
+});
+</script>
+
+</body>
+</html>

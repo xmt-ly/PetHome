@@ -1,0 +1,19 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# IDE
+.idea/
+
+# Build output
+out/
+
+# Crawling cache
+.firecrawl/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

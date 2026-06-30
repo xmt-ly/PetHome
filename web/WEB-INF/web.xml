@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee
+                             https://jakarta.ee/xml/ns/jakartaee/web-app_6_1.xsd"
+         version="6.1">
+
+    <display-name>PetHome - 萌宠之家</display-name>
+    <description>萌宠之家 - 专业宠物护理与购物平台</description>
+
+    <!-- UTF-8 编码过滤器（必须是第一个 Filter） -->
+    <filter>
+        <filter-name>EncodingFilter</filter-name>
+        <filter-class>org.apache.catalina.filters.SetCharacterEncodingFilter</filter-class>
+        <init-param>
+            <param-name>encoding</param-name>
+            <param-value>UTF-8</param-value>
+        </init-param>
+        <init-param>
+            <param-name>ignore</param-name>
+            <param-value>false</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>EncodingFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <!-- 登录验证过滤器 -->
+    <filter>
+        <filter-name>AuthFilter</filter-name>
+        <filter-class>com.pethome.filter.AuthFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>AuthFilter</filter-name>
+        <url-pattern>/jsp/cart.jsp</url-pattern>
+        <url-pattern>/jsp/checkout.jsp</url-pattern>
+        <url-pattern>/jsp/order-list.jsp</url-pattern>
+        <url-pattern>/jsp/user-profile.jsp</url-pattern>
+        <url-pattern>/jsp/admin/*</url-pattern>
+        <url-pattern>/cart</url-pattern>
+        <url-pattern>/order</url-pattern>
+        <url-pattern>/admin/*</url-pattern>
+    </filter-mapping>
+
+    <!-- JSP 全局编码设置与公共包含 -->
+    <jsp-config>
+        <jsp-property-group>
+            <url-pattern>*.jsp</url-pattern>
+            <page-encoding>UTF-8</page-encoding>
+            <include-prelude>/jsp/common/head.jspf</include-prelude>
+            <include-coda>/jsp/common/common-scripts.jspf</include-coda>
+        </jsp-property-group>
+    </jsp-config>
+
+    <!-- .jspf 映射到 JSP Servlet，确保 <jsp:include> 包含的片段能被编译 -->
+    <servlet-mapping>
+        <servlet-name>jsp</servlet-name>
+        <url-pattern>*.jspf</url-pattern>
+    </servlet-mapping>
+
+    <!-- 欢迎页面 -->
+    <welcome-file-list>
+        <welcome-file>index.jsp</welcome-file>
+    </welcome-file-list>
+
+    <!-- Session 超时（分钟） -->
+    <session-config>
+        <session-timeout>30</session-timeout>
+    </session-config>
+
+    <!-- 错误页面 -->
+    <error-page>
+        <error-code>404</error-code>
+        <location>/jsp/error/404.jsp</location>
+    </error-page>
+    <error-page>
+        <error-code>500</error-code>
+        <location>/jsp/error/500.jsp</location>
+    </error-page>
+
+</web-app>
