@@ -169,10 +169,7 @@ public class ProductDao extends BaseDao<Product> {
         p.setStatus(rs.getInt("status"));
         p.setTag(rs.getString("tag"));
         // 分类名称（LEFT JOIN 得到）
-        try {
-            p.setCategoryName(rs.getString("category_name"));
-        } catch (SQLException ignored) {
-        }
+        p.setCategoryName(rs.getString("category_name"));
         if (rs.getTimestamp("created_at") != null) {
             p.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
         }

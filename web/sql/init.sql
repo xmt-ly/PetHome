@@ -15,7 +15,6 @@ USE pethome;
 -- ============================================================
 DROP TABLE IF EXISTS t_order_item;
 DROP TABLE IF EXISTS t_order;
-DROP TABLE IF EXISTS t_cart;
 DROP TABLE IF EXISTS t_service;
 DROP TABLE IF EXISTS t_product;
 DROP TABLE IF EXISTS t_category;

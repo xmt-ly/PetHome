@@ -128,7 +128,9 @@ public class OrderDao extends BaseDao<Order> {
      * 根据用户 ID 查询订单列表（按时间倒序）
      */
     public List<Order> findByUserId(int userId) {
-        String sql = "SELECT * FROM t_order WHERE user_id = ? ORDER BY created_at DESC";
+        String sql = "SELECT o.*, u.username FROM t_order o "
+                + "LEFT JOIN t_user u ON o.user_id = u.id "
+                + "WHERE o.user_id = ? ORDER BY o.created_at DESC";
         return queryForList(sql, userId);
     }
 
@@ -250,10 +252,7 @@ public class OrderDao extends BaseDao<Order> {
             o.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
         }
         // 用户名（LEFT JOIN 得到）
-        try {
-            o.setUsername(rs.getString("username"));
-        } catch (SQLException ignored) {
-        }
+        o.setUsername(rs.getString("username"));
         return o;
     }
 }

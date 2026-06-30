@@ -207,14 +207,36 @@ public class OrderServlet extends HttpServlet {
     // ==================== 取消订单 ====================
 
     private void handleCancel(HttpServletRequest req, HttpServletResponse resp)
-            throws IOException {
+            throws ServletException, IOException {
+        HttpSession session = req.getSession();
+        User user = (User) session.getAttribute("user");
+
+        if (user == null) {
+            resp.sendRedirect(req.getContextPath() + "/jsp/login.jsp");
+            return;
+        }
+
         String idStr = req.getParameter("id");
         if (idStr == null || idStr.isEmpty()) {
             resp.sendRedirect(req.getContextPath() + "/order?action=list");
             return;
         }
 
-        int id = Integer.parseInt(idStr);
+        int id;
+        try {
+            id = Integer.parseInt(idStr);
+        } catch (NumberFormatException e) {
+            resp.sendRedirect(req.getContextPath() + "/order?action=list");
+            return;
+        }
+
+        // 验证订单属于当前用户
+        Order order = orderDao.findById(id);
+        if (order == null || order.getUserId() != user.getId()) {
+            resp.sendRedirect(req.getContextPath() + "/order?action=list");
+            return;
+        }
+
         int result = orderDao.cancelOrder(id);
 
         if (result > 0) {

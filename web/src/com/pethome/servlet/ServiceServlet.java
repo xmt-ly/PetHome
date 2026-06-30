@@ -9,8 +9,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
 
 /**
  * 服务模块 Servlet
@@ -49,13 +47,6 @@ public class ServiceServlet extends HttpServlet {
             throws ServletException, IOException {
         // 查询所有服务
         List<Service> allServices = serviceDao.findAll();
-
-        // 按分类分组（体现 Map 的应用）
-        Map<String, List<Service>> serviceMap = new HashMap<>();
-        for (Service s : allServices) {
-            String category = s.getCategory();
-            // 这里简化处理，实际应该在 DAO 层分组查询
-        }
 
         // 按分类查询
         List<Service> groomingServices = serviceDao.findByCategory("grooming");

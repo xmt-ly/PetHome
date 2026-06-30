@@ -81,17 +81,14 @@ public class ProductServlet extends HttpServlet {
         }
         int pageSize = 24;
 
-        // 查询商品列表和分类信息
+        // 查询分页商品列表和分类信息
         List<Product> productList = productDao.findPage(page, pageSize);
         int totalCount = productDao.countAll();
         int totalPages = (int) Math.ceil((double) totalCount / pageSize);
 
-        // 查询所有商品（首页展示用）和分类列表
-        List<Product> allProducts = productDao.findAll();
         List<Category> categories = categoryDao.findAll();
 
         req.setAttribute("productList", productList);
-        req.setAttribute("allProducts", allProducts);
         req.setAttribute("categories", categories);
         req.setAttribute("currentPage", page);
         req.setAttribute("totalPages", totalPages);

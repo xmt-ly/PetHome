@@ -146,7 +146,6 @@ public class AdminServlet extends HttpServlet {
 
     private void handleProductAdd(HttpServletRequest req, HttpServletResponse resp)
             throws IOException, ServletException {
-        System.out.println("[AdminServlet] handleProductAdd 被调用");
         String name = req.getParameter("name");
         String price = req.getParameter("price");
         String categoryId = req.getParameter("categoryId");
@@ -154,17 +153,46 @@ public class AdminServlet extends HttpServlet {
         String stock = req.getParameter("stock");
         String description = req.getParameter("description");
         String tag = req.getParameter("tag");
-        System.out.println("[AdminServlet] 参数: name=" + name + ", price=" + price + ", categoryId=" + categoryId);
+
+        // 参数校验
+        if (name == null || name.trim().isEmpty()) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "商品名称不能为空");
+            return;
+        }
+        if (price == null || price.trim().isEmpty()) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "商品价格不能为空");
+            return;
+        }
+        if (categoryId == null || categoryId.trim().isEmpty()) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "商品分类不能为空");
+            return;
+        }
+        if (stock == null || stock.trim().isEmpty()) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "库存不能为空");
+            return;
+        }
+
+        BigDecimal productPrice;
+        int productCategoryId;
+        int productStock;
+        try {
+            productPrice = new BigDecimal(price);
+            productCategoryId = Integer.parseInt(categoryId);
+            productStock = Integer.parseInt(stock);
+        } catch (NumberFormatException e) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "参数格式错误");
+            return;
+        }
 
         // 处理图片上传
         String imageUrl = saveUploadedImage(req);
 
         Product p = new Product();
         p.setName(name);
-        p.setPrice(new BigDecimal(price));
-        p.setCategoryId(Integer.parseInt(categoryId));
+        p.setPrice(productPrice);
+        p.setCategoryId(productCategoryId);
         p.setBrand(brand);
-        p.setStock(Integer.parseInt(stock));
+        p.setStock(productStock);
         p.setDescription(description);
         p.setImageUrl(imageUrl);
         p.setTag(tag != null ? tag : "");
@@ -177,15 +205,51 @@ public class AdminServlet extends HttpServlet {
 
     private void handleProductEdit(HttpServletRequest req, HttpServletResponse resp)
             throws IOException, ServletException {
-        String id = req.getParameter("id");
+        String idStr = req.getParameter("id");
         String name = req.getParameter("name");
         String price = req.getParameter("price");
         String categoryId = req.getParameter("categoryId");
         String brand = req.getParameter("brand");
         String stock = req.getParameter("stock");
         String description = req.getParameter("description");
-        String status = req.getParameter("status");
+        String statusStr = req.getParameter("status");
         String tag = req.getParameter("tag");
+
+        // 参数校验
+        if (idStr == null || idStr.trim().isEmpty()) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "商品ID不能为空");
+            return;
+        }
+        if (name == null || name.trim().isEmpty()) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "商品名称不能为空");
+            return;
+        }
+        if (price == null || price.trim().isEmpty()) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "商品价格不能为空");
+            return;
+        }
+        if (categoryId == null || categoryId.trim().isEmpty()) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "商品分类不能为空");
+            return;
+        }
+        if (stock == null || stock.trim().isEmpty()) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "库存不能为空");
+            return;
+        }
+
+        int productId;
+        BigDecimal productPrice;
+        int productCategoryId;
+        int productStock;
+        try {
+            productId = Integer.parseInt(idStr);
+            productPrice = new BigDecimal(price);
+            productCategoryId = Integer.parseInt(categoryId);
+            productStock = Integer.parseInt(stock);
+        } catch (NumberFormatException e) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "参数格式错误");
+            return;
+        }
 
         // 处理图片：有新上传则替换，否则保留原值
         String imageUrl = saveUploadedImage(req);
@@ -193,17 +257,26 @@ public class AdminServlet extends HttpServlet {
             imageUrl = req.getParameter("existingImageUrl");
         }
 
+        int productStatus = 1;
+        if (statusStr != null && !statusStr.isEmpty()) {
+            try {
+                productStatus = Integer.parseInt(statusStr);
+            } catch (NumberFormatException e) {
+                // 保持默认值 1
+            }
+        }
+
         Product p = new Product();
-        p.setId(Integer.parseInt(id));
+        p.setId(productId);
         p.setName(name);
-        p.setPrice(new BigDecimal(price));
-        p.setCategoryId(Integer.parseInt(categoryId));
+        p.setPrice(productPrice);
+        p.setCategoryId(productCategoryId);
         p.setBrand(brand);
-        p.setStock(Integer.parseInt(stock));
+        p.setStock(productStock);
         p.setDescription(description);
         p.setImageUrl(imageUrl != null ? imageUrl : "");
         p.setTag(tag != null ? tag : "");
-        p.setStatus(status != null ? Integer.parseInt(status) : 1);
+        p.setStatus(productStatus);
 
         productDao.update(p);
         System.out.println("[AdminServlet] 更新商品: " + name);
@@ -246,8 +319,17 @@ public class AdminServlet extends HttpServlet {
     private void handleProductDelete(HttpServletRequest req, HttpServletResponse resp)
             throws IOException {
         String id = req.getParameter("id");
-        productDao.deleteById(Integer.parseInt(id));
-        System.out.println("[AdminServlet] 删除商品 ID: " + id);
+        if (id == null || id.trim().isEmpty()) {
+            resp.sendRedirect(req.getContextPath() + "/admin?module=product");
+            return;
+        }
+        try {
+            int productId = Integer.parseInt(id);
+            productDao.deleteById(productId);
+            System.out.println("[AdminServlet] 删除商品 ID: " + id);
+        } catch (NumberFormatException e) {
+            // 忽略无效 ID
+        }
         resp.sendRedirect(req.getContextPath() + "/admin?module=product");
     }
 
@@ -284,10 +366,28 @@ public class AdminServlet extends HttpServlet {
         String price = req.getParameter("price");
         String category = req.getParameter("category");
 
+        // 参数校验
+        if (name == null || name.trim().isEmpty()) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "服务名称不能为空");
+            return;
+        }
+        if (price == null || price.trim().isEmpty()) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "服务价格不能为空");
+            return;
+        }
+
+        BigDecimal servicePrice;
+        try {
+            servicePrice = new BigDecimal(price);
+        } catch (NumberFormatException e) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "价格格式错误");
+            return;
+        }
+
         Service s = new Service();
         s.setName(name);
         s.setDescription(description);
-        s.setPrice(new BigDecimal(price));
+        s.setPrice(servicePrice);
         s.setCategory(category);
         s.setStatus(1);
 
@@ -297,20 +397,53 @@ public class AdminServlet extends HttpServlet {
 
     private void handleServiceEdit(HttpServletRequest req, HttpServletResponse resp)
             throws IOException {
-        String id = req.getParameter("id");
+        String idStr = req.getParameter("id");
         String name = req.getParameter("name");
         String description = req.getParameter("description");
         String price = req.getParameter("price");
         String category = req.getParameter("category");
-        String status = req.getParameter("status");
+        String statusStr = req.getParameter("status");
+
+        // 参数校验
+        if (idStr == null || idStr.trim().isEmpty()) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "服务ID不能为空");
+            return;
+        }
+        if (name == null || name.trim().isEmpty()) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "服务名称不能为空");
+            return;
+        }
+        if (price == null || price.trim().isEmpty()) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "服务价格不能为空");
+            return;
+        }
+
+        int serviceId;
+        BigDecimal servicePrice;
+        try {
+            serviceId = Integer.parseInt(idStr);
+            servicePrice = new BigDecimal(price);
+        } catch (NumberFormatException e) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "参数格式错误");
+            return;
+        }
+
+        int serviceStatus = 1;
+        if (statusStr != null && !statusStr.isEmpty()) {
+            try {
+                serviceStatus = Integer.parseInt(statusStr);
+            } catch (NumberFormatException e) {
+                // 保持默认值 1
+            }
+        }
 
         Service s = new Service();
-        s.setId(Integer.parseInt(id));
+        s.setId(serviceId);
         s.setName(name);
         s.setDescription(description);
-        s.setPrice(new BigDecimal(price));
+        s.setPrice(servicePrice);
         s.setCategory(category);
-        s.setStatus(Integer.parseInt(status));
+        s.setStatus(serviceStatus);
 
         serviceDao.update(s);
         resp.sendRedirect(req.getContextPath() + "/admin?module=service");
@@ -319,7 +452,16 @@ public class AdminServlet extends HttpServlet {
     private void handleServiceDelete(HttpServletRequest req, HttpServletResponse resp)
             throws IOException {
         String id = req.getParameter("id");
-        serviceDao.deleteById(Integer.parseInt(id));
+        if (id == null || id.trim().isEmpty()) {
+            resp.sendRedirect(req.getContextPath() + "/admin?module=service");
+            return;
+        }
+        try {
+            int serviceId = Integer.parseInt(id);
+            serviceDao.deleteById(serviceId);
+        } catch (NumberFormatException e) {
+            // 忽略无效 ID
+        }
         resp.sendRedirect(req.getContextPath() + "/admin?module=service");
     }
 
@@ -330,7 +472,13 @@ public class AdminServlet extends HttpServlet {
         if ("updateStatus".equals(action)) {
             String id = req.getParameter("id");
             String status = req.getParameter("status");
-            orderDao.updateStatus(Integer.parseInt(id), Integer.parseInt(status));
+            if (id != null && status != null) {
+                try {
+                    orderDao.updateStatus(Integer.parseInt(id), Integer.parseInt(status));
+                } catch (NumberFormatException e) {
+                    // 忽略无效参数
+                }
+            }
             resp.sendRedirect(req.getContextPath() + "/admin?module=order");
         } else {
             List<Order> orderList = orderDao.findAll();
@@ -345,7 +493,13 @@ public class AdminServlet extends HttpServlet {
                                   String action) throws ServletException, IOException {
         if ("delete".equals(action)) {
             String id = req.getParameter("id");
-            userDao.deleteById(Integer.parseInt(id));
+            if (id != null) {
+                try {
+                    userDao.deleteById(Integer.parseInt(id));
+                } catch (NumberFormatException e) {
+                    // 忽略无效 ID
+                }
+            }
             resp.sendRedirect(req.getContextPath() + "/admin?module=user");
         } else {
             List<User> userList = userDao.findAll();
